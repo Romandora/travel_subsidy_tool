@@ -1,0 +1,27 @@
+name: 自动打包发布
+on:
+  push:
+    tags:
+      - 'v*' # 当你推送以 v 开头的标签（如 v1.0）时触发
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: 安装依赖
+        run: |
+          pip install -r requirements.txt
+          pip install pyinstaller
+      - name: 执行打包
+        run: pyinstaller --onefile --noconsole --name "差旅津贴计算器" main_gui.py
+      - name: 发布 Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/差旅津贴计算器.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
